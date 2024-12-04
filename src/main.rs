@@ -8,6 +8,7 @@ mod api;
 mod cli;
 mod db;
 mod service;
+mod util;
 
 #[tokio::main]
 async fn main() {

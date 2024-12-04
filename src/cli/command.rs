@@ -1,59 +1,34 @@
+use crate::util::eval::eval;
 use chrono::{Datelike, NaiveDate, Utc};
-use clap::Parser;
-use clap::ValueEnum;
-use std::fmt::Display;
-
-#[derive(ValueEnum, Clone, Debug)]
-pub enum Kind {
-    #[clap(alias = "f")]
-    Food, //饮食
-
-    #[clap(alias = "l")]
-    Life, //生活
-
-    #[clap(alias = "s")]
-    Study, //学习
-
-    #[clap(alias = "r")]
-    Rest, //休闲
-}
-#[derive(ValueEnum, Clone, Debug)]
-pub enum Account {
-    #[clap(alias = "a")]
-    Alipay, //支付宝
-
-    #[clap(alias = "w")]
-    Wechat, //微信，校园卡
-
-    #[clap(alias = "b")]
-    BankOfChina, //中国银行
-
-    #[clap(alias = "i")]
-    ICBC, //工商银行
-}
-impl Display for Kind {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let str = match self {
-            Kind::Food => "food".to_string(),
-            Kind::Life => "life".to_string(),
-            Kind::Study => "study".to_string(),
-            Kind::Rest => "rest".to_string(),
-        };
-        write!(f, "{}", str)
-    }
-}
-
-impl Display for Account {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let str = match self {
-            Account::Alipay => "alipay".to_string(),
-            Account::Wechat => "wechat".to_string(),
-            Account::BankOfChina => "bankofchina".to_string(),
-            Account::ICBC => "icbc".to_string(),
-        };
-        write!(f, "{}", str)
-    }
-}
+use clap::{ArgGroup, Parser};
+// #[derive(ValueEnum, Clone, Debug)]
+// pub enum Kind {
+//     #[clap(alias = "f")]
+//     Food, //饮食
+//
+//     #[clap(alias = "l")]
+//     Life, //生活
+//
+//     #[clap(alias = "s")]
+//     Study, //学习
+//
+//     #[clap(alias = "r")]
+//     Rest, //休闲
+// }
+// #[derive(ValueEnum, Clone, Debug)]
+// pub enum Account {
+//     #[clap(alias = "a")]
+//     Alipay, //支付宝
+//
+//     #[clap(alias = "w")]
+//     Wechat, //微信，校园卡
+//
+//     #[clap(alias = "b")]
+//     BankOfChina, //中国银行
+//
+//     #[clap(alias = "i")]
+//     ICBC, //工商银行
+// }
 
 /// Ledger CLI
 #[derive(Parser, Debug)]
@@ -64,12 +39,53 @@ impl Display for Account {
     author = "osmanthuspeace"
 )]
 #[command(about = "A special ledger CLI application", long_about = None)]
+#[clap(group(
+    ArgGroup::new("kind")
+        .required(false)
+        .args(&["food", "life", "study", "rest"])
+))]
+#[clap(group(
+    ArgGroup::new("account")
+        .required(false)
+        .args(&["alipay", "wechat", "bankofchina", "icbc"])
+))]
 pub struct Cli {
-    #[arg(short, long, value_enum, default_value_t = Kind::Food)]
-    pub kind: Kind,
+    // #[arg(short, long, value_enum, default_value_t = Kind::Food)]
+    // pub kind: Kind,
+    //
+    // #[arg(short, long, value_enum, default_value_t = Account::Alipay)]
+    // pub account: Account,
+    /// 饮食类支出
+    #[arg(short = 'f', long = "food", help = "Kind: Food")]
+    pub food: bool,
 
-    #[arg(short, long, value_enum, default_value_t = Account::Alipay)]
-    pub account: Account,
+    /// 生活类支出
+    #[arg(short = 'l', long = "life", help = "Kind: Life")]
+    pub life: bool,
+
+    /// 学习类支出
+    #[arg(short = 's', long = "study", help = "Kind: Study")]
+    pub study: bool,
+
+    /// 休闲类支出
+    #[arg(short = 'r', long = "rest", help = "Kind: Rest")]
+    pub rest: bool,
+
+    /// 支付账户: Alipay
+    #[arg(short = 'a', long = "alipay", help = "Account: Alipay")]
+    pub alipay: bool,
+
+    /// 支付账户: WeChat
+    #[arg(short = 'w', long = "wechat", help = "Account: WeChat")]
+    pub wechat: bool,
+
+    /// 支付账户: Bank of China
+    #[arg(short = 'b', long = "bankofchina", help = "Account: Bank of China")]
+    pub bankofchina: bool,
+
+    /// 支付账户: ICBC
+    #[arg(short = 'i', long = "icbc", help = "Account: ICBC")]
+    pub icbc: bool,
 
     /// 位置参数：
     /// - 如果有三个参数：date description amount
@@ -80,10 +96,30 @@ pub struct Cli {
 
 impl Cli {
     pub fn kind(&self) -> String {
-        self.kind.to_string()
+        // self.kind.to_string()
+        if self.life {
+            "life".to_string()
+        } else if self.study {
+            "study".to_string()
+        } else if self.rest {
+            "rest".to_string()
+        } else {
+            // 默认 food
+            "food".to_string()
+        }
     }
     pub fn account(&self) -> String {
-        self.account.to_string()
+        // self.account.to_string()
+        if self.wechat {
+            "wechat".to_string()
+        } else if self.bankofchina {
+            "bankofchina".to_string()
+        } else if self.icbc {
+            "icbc".to_string()
+        } else {
+            // 默认 alipay
+            "alipay".to_string()
+        }
     }
     pub fn date(&self) -> NaiveDate {
         let current_year = Utc::now().year();
@@ -121,15 +157,24 @@ impl Cli {
     /// 获取金额
     pub fn amount(&self) -> f64 {
         if self.args.len() == 3 {
-            self.args[2].parse::<f64>().unwrap_or_else(|_| {
-                eprintln!("金额解析错误，使用 0");
-                0.0
-            })
+            let arg = &self.args[2];
+            Self::parse_amount(arg)
         } else {
-            self.args[1].parse::<f64>().unwrap_or_else(|_| {
-                eprintln!("金额解析错误，使用 0");
+            let arg = &self.args[1];
+            Self::parse_amount(arg)
+        }
+    }
+    fn parse_amount(arg: &String) -> f64 {
+        match arg.chars().nth(0) {
+            Some('=') => eval(arg),
+            Some('+') => arg[1..].parse::<f64>().unwrap_or_else(|_| {
+                eprintln!("收入金额解析错误，使用 0");
                 0.0
-            })
+            }),
+            _ => arg.parse::<f64>().unwrap_or_else(|_| {
+                eprintln!("支出金额解析错误，使用 0");
+                0.0
+            }),
         }
     }
 }

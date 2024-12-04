@@ -5,7 +5,7 @@ diesel::table! {
         id -> Int4,
         date -> Date,
         kind -> Varchar,
-        description -> Text,
+        description -> Varchar,
         amount -> Float8,
         account -> Varchar,
     }
