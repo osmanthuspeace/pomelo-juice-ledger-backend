@@ -1,0 +1,11 @@
+[package]
+name = "my-ledger-backend"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum = "0.7.9"
+clap = "4.5.22"
+diesel = { version = "2.2.6", features = ["postgres"] }
+tokio = { version = "1.0.0", features = ["rt", "rt-multi-thread", "macros"] }
+serde = { version = "1.0.215", features = ["derive"] }
