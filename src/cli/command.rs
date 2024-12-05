@@ -166,15 +166,18 @@ impl Cli {
     }
     fn parse_amount(arg: &String) -> f64 {
         match arg.chars().nth(0) {
-            Some('=') => eval(arg),
+            Some('=') => eval(arg), //返回负数
             Some('+') => arg[1..].parse::<f64>().unwrap_or_else(|_| {
                 eprintln!("收入金额解析错误，使用 0");
-                0.0
+                return 0.0;
             }),
-            _ => arg.parse::<f64>().unwrap_or_else(|_| {
-                eprintln!("支出金额解析错误，使用 0");
-                0.0
-            }),
+            _ => {
+                let res = arg.parse::<f64>().unwrap_or_else(|_| {
+                    eprintln!("支出金额解析错误，使用 0");
+                    return 0.0;
+                });
+                -res
+            }
         }
     }
 }

@@ -21,10 +21,11 @@ pub fn eval(expression: &str) -> f64 {
         }
     };
     // 步骤 3: 计算表达式
-    evaluate_infix(&tokens).unwrap_or_else(|e| {
+    let res = evaluate_infix(&tokens).unwrap_or_else(|e| {
         eprintln!("计算时出现错误: {}", e);
         0.0
-    })
+    });
+    -res
 }
 
 fn tokenize(expr: &str) -> Result<Vec<Token>, String> {

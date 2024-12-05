@@ -1,6 +1,6 @@
 use crate::cli::command::Cli;
 use crate::db::models::NewTransaction;
-use crate::service::transaction_service::create_transaction;
+use crate::service::create_service::create_transaction;
 use chrono::NaiveDate;
 use clap::Parser;
 

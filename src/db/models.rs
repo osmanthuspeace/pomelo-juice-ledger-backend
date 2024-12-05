@@ -1,4 +1,4 @@
-use crate::db::schema::transactions;
+use crate::db::schema::*;
 use chrono::NaiveDate;
 use diesel::{Insertable, Queryable};
 use serde::{Deserialize, Serialize};
@@ -14,9 +14,21 @@ pub struct Transaction {
     pub amount: f64,
     pub account: String,
 }
+#[derive(Debug, Queryable, Insertable, Serialize, Deserialize)]
+#[table_name = "summary"]
+pub struct Summary {
+    pub id: i32,
+    pub balance: f64,
+    pub storage: f64,
+
+    pub alipay: f64,
+    pub wechat: f64,
+    pub bankofchina: f64,
+    pub icbc: f64,
+}
 
 //插入模型
-#[derive(Insertable)]
+#[derive(Debug, Queryable, Insertable, Serialize, Deserialize)]
 #[diesel(table_name = transactions)]
 pub struct NewTransaction {
     pub date: NaiveDate,
