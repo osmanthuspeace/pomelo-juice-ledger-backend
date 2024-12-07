@@ -18,13 +18,9 @@ pub struct Transaction {
 #[table_name = "summary"]
 pub struct Summary {
     pub id: i32,
-    pub balance: f64,
-    pub storage: f64,
 
-    pub alipay: f64,
-    pub wechat: f64,
-    pub bankofchina: f64,
-    pub icbc: f64,
+    pub account: String,
+    pub amount: f64,
 }
 
 //插入模型

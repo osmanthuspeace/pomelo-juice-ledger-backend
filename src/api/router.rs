@@ -5,5 +5,4 @@ use crate::api::handler::get_transactions;
 pub fn create_router() -> Router {
     Router::new()
         .route("/transactions", get(get_transactions))  // 获取交易记录
-        .route("/transactions", post(create_transaction))  // 创建交易记录
 }

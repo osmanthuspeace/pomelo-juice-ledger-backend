@@ -1,8 +1,8 @@
-use crate::db::models::Transaction;
 use crate::service;
 use axum::extract::Query;
 use axum::http::StatusCode;
 use axum::Json;
+use axum::response::IntoResponse;
 use chrono::{Datelike, NaiveDate, Utc};
 use serde::Deserialize;
 
@@ -11,9 +11,9 @@ pub struct TransactionsQuery {
     from: String,
     to: String,
 }
-pub fn get_transactions(
+pub async fn get_transactions(
     Query(params): Query<TransactionsQuery>,
-) -> Result<Json<Vec<Transaction>>, StatusCode> {
+) -> impl IntoResponse {
     let from = NaiveDate::parse_from_str(&params.from, "%Y-%m-%d").unwrap_or_else(|_| {
         NaiveDate::from_ymd_opt(Utc::now().year(), Utc::now().month(), 1).unwrap()
     });
@@ -28,4 +28,7 @@ pub fn get_transactions(
             Err(StatusCode::INTERNAL_SERVER_ERROR)
         }
     }
+}
+pub fn create_transactions(){
+    todo!()
 }

@@ -2,13 +2,9 @@
 
 diesel::table! {
     summary (id) {
-        balance -> Nullable<Float8>,
-        storage -> Nullable<Float8>,
-        alipay -> Nullable<Float8>,
-        wechat -> Nullable<Float8>,
-        bankofchina -> Nullable<Float8>,
-        icbc -> Nullable<Float8>,
         id -> Int4,
+        account -> Varchar,
+        amount -> Float8,
     }
 }
 
@@ -17,7 +13,7 @@ diesel::table! {
         id -> Int4,
         date -> Date,
         kind -> Varchar,
-        description -> Varchar,
+        description -> Text,
         amount -> Float8,
         account -> Varchar,
     }
