@@ -13,6 +13,7 @@ pub struct Transaction {
     pub description: String,
     pub amount: f64,
     pub account: String,
+    pub balance: f64,
 }
 #[derive(Debug, Queryable, Insertable, Serialize, Deserialize)]
 #[table_name = "summary"]

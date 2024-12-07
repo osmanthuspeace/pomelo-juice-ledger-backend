@@ -10,6 +10,7 @@ mod cli;
 mod db;
 mod service;
 mod util;
+mod transform;
 
 #[tokio::main]
 async fn main() {

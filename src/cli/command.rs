@@ -33,7 +33,11 @@ pub struct Cli {
         num_args = 1..
     )]
     pub init: Option<Vec<f64>>,
-    
+
+    ///是否要导出
+    #[arg(long = "transform", help = "导出 Excel 文件")]
+    pub transform: Option<bool>,
+
     /// 饮食类支出
     #[arg(short = 'f', long = "food", help = "Kind: Food")]
     pub food: bool,
@@ -159,6 +163,7 @@ impl Cli {
             }
         }
     }
+
     pub fn execute(&self) {
         if let Some(params) = &self.init {
             if params.len() < 5 {
@@ -171,6 +176,10 @@ impl Cli {
             println!("Initializing system with parameters: {:?}", params);
             init_summary(params[0], params[1], params[2], params[3], params[4])
                 .expect("Error initializing system");
+        } else if let &Some(flag) = &self.transform {
+            if flag {
+                println!("Transforming data...");
+            }
         } else {
             if self.args.len() < 2 {
                 eprintln!("Error: Not enough arguments provided for transaction creation");

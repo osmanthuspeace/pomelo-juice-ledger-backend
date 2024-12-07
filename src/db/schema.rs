@@ -16,6 +16,7 @@ diesel::table! {
         description -> Text,
         amount -> Float8,
         account -> Varchar,
+        balance -> Float8,
     }
 }
 

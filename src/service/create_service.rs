@@ -5,15 +5,21 @@ use crate::db::schema::transactions::dsl::transactions;
 use crate::service::connection::establish_connection;
 use diesel::result::Error;
 use diesel::prelude::*;
+use crate::db::schema::transactions::balance;
 
 pub fn create_transaction(new_transaction: &NewTransaction) -> Result<Transaction, Error> {
     let mut connection = establish_connection();
+    //同步更新 summary 表
     update_summary_when_creating(
         &mut connection,
         &new_transaction.account,
         new_transaction.amount,
     )
     .expect("Error updating summary");
+    diesel::update(transactions)
+        .set(balance.eq(balance + new_transaction.amount))
+        .execute(&mut connection)
+        .expect("Error updating balance");
     diesel::insert_into(transactions)
         .values(new_transaction)
         .get_result(&mut connection)
