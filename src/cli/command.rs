@@ -1,34 +1,9 @@
+use crate::db::models::NewTransaction;
+use crate::service::create_service::create_transaction;
+use crate::service::init_service::init_summary;
 use crate::util::eval::eval;
 use chrono::{Datelike, NaiveDate, Utc};
 use clap::{ArgGroup, Parser};
-// #[derive(ValueEnum, Clone, Debug)]
-// pub enum Kind {
-//     #[clap(alias = "f")]
-//     Food, //饮食
-//
-//     #[clap(alias = "l")]
-//     Life, //生活
-//
-//     #[clap(alias = "s")]
-//     Study, //学习
-//
-//     #[clap(alias = "r")]
-//     Rest, //休闲
-// }
-// #[derive(ValueEnum, Clone, Debug)]
-// pub enum Account {
-//     #[clap(alias = "a")]
-//     Alipay, //支付宝
-//
-//     #[clap(alias = "w")]
-//     Wechat, //微信，校园卡
-//
-//     #[clap(alias = "b")]
-//     BankOfChina, //中国银行
-//
-//     #[clap(alias = "i")]
-//     ICBC, //工商银行
-// }
 
 /// Ledger CLI
 #[derive(Parser, Debug)]
@@ -50,11 +25,15 @@ use clap::{ArgGroup, Parser};
         .args(&["alipay", "wechat", "bankofchina", "icbc"])
 ))]
 pub struct Cli {
-    // #[arg(short, long, value_enum, default_value_t = Kind::Food)]
-    // pub kind: Kind,
-    //
-    // #[arg(short, long, value_enum, default_value_t = Account::Alipay)]
-    // pub account: Account,
+    /// 初始化参数
+    #[arg(
+        long = "init",
+        help = "Initialize summary with parameters",
+        value_parser,
+        num_args = 1..
+    )]
+    pub init: Option<Vec<f64>>,
+    
     /// 饮食类支出
     #[arg(short = 'f', long = "food", help = "Kind: Food")]
     pub food: bool,
@@ -178,6 +157,43 @@ impl Cli {
                 });
                 -res
             }
+        }
+    }
+    pub fn execute(&self) {
+        if let Some(params) = &self.init {
+            if params.len() < 5 {
+                eprintln!(
+                    "Error: `--init` requires at least 5 parameters, but got {}",
+                    params.len()
+                );
+                return;
+            }
+            println!("Initializing system with parameters: {:?}", params);
+            init_summary(params[0], params[1], params[2], params[3], params[4])
+                .expect("Error initializing system");
+        } else {
+            if self.args.len() < 2 {
+                eprintln!("Error: Not enough arguments provided for transaction creation");
+                return;
+            }
+            let kind = self.kind();
+            let account = self.account();
+            let date = self.date();
+            let description = self.description();
+            let amount = self.amount();
+
+            println!(
+                "Creating transaction: kind={}, account={}, date={}, description={}, amount={}",
+                kind, account, date, description, amount
+            );
+            create_transaction(&NewTransaction::new(
+                date,
+                kind,
+                description.clone(),
+                amount,
+                account,
+            ))
+            .expect("Error creating transaction");
         }
     }
 }

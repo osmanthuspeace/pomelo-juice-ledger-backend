@@ -30,7 +30,7 @@ fn update_summary_when_creating(
         "icbc" => "icbc",
         _ => {
             eprintln!("未知的账户类型: {}", update_account);
-            return Err(diesel::result::Error::NotFound);
+            return Err(Error::NotFound);
         }
     };
 
