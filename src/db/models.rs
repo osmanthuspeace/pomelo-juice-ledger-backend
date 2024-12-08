@@ -20,6 +20,7 @@ pub struct Transaction {
 pub struct Summary {
     pub id: i32,
 
+    ///余额应该与交易表中的最新的余额字段保持一致
     pub account: String,
     pub amount: f64,
 }

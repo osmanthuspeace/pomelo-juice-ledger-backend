@@ -16,3 +16,10 @@ rust_xlsxwriter = "0.80.0"
 
 [profile.dev]
 rustfmt.skip_unreachable = true
+
+[[bin]]
+name = "cli"
+path = "src/bin/cli.rs"
+[[bin]]
+name = "api"
+path = "src/bin/api.rs"

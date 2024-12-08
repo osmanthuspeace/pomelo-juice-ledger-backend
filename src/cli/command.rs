@@ -1,6 +1,7 @@
 use crate::db::models::NewTransaction;
 use crate::service::create_service::create_transaction;
 use crate::service::init_service::init_summary;
+use crate::transform::export_to_excel::export_to_excel;
 use crate::util::eval::eval;
 use chrono::{Datelike, NaiveDate, Utc};
 use clap::{ArgGroup, Parser};
@@ -37,6 +38,10 @@ pub struct Cli {
     ///是否要导出
     #[arg(long = "transform", help = "导出 Excel 文件")]
     pub transform: Option<bool>,
+
+    ///是否要将余额同步
+    #[arg(long = "sync", help = "同步余额")]
+    pub sync: Option<bool>,
 
     /// 饮食类支出
     #[arg(short = 'f', long = "food", help = "Kind: Food")]
@@ -178,7 +183,11 @@ impl Cli {
                 .expect("Error initializing system");
         } else if let &Some(flag) = &self.transform {
             if flag {
-                println!("Transforming data...");
+                export_to_excel().expect("Error exporting to Excel");
+            }
+        } else if let &Some(flag) = &self.sync {
+            if flag {
+                println!("Syncing data...");
             }
         } else {
             if self.args.len() < 2 {
