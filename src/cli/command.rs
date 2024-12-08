@@ -2,6 +2,7 @@ use crate::db::models::NewTransaction;
 use crate::service::create_service::create_transaction;
 use crate::service::init_service::init_summary;
 use crate::transform::export_to_excel::export_to_excel;
+use crate::transform::import_from_excel::import_from_excel;
 use crate::util::eval::eval;
 use chrono::{Datelike, NaiveDate, Utc};
 use clap::{ArgGroup, Parser};
@@ -36,8 +37,12 @@ pub struct Cli {
     pub init: Option<Vec<f64>>,
 
     ///是否要导出
-    #[arg(long = "transform", help = "导出 Excel 文件")]
-    pub transform: Option<bool>,
+    #[arg(long = "export", help = "导出 Excel 文件")]
+    pub export: Option<bool>,
+
+    ///是否要导入
+    #[arg(long = "import", help = "导入 Excel 文件")]
+    pub import: Option<String>,
 
     ///是否要将余额同步
     #[arg(long = "sync", help = "同步余额")]
@@ -181,10 +186,12 @@ impl Cli {
             println!("Initializing system with parameters: {:?}", params);
             init_summary(params[0], params[1], params[2], params[3], params[4])
                 .expect("Error initializing system");
-        } else if let &Some(flag) = &self.transform {
+        } else if let &Some(flag) = &self.export {
             if flag {
                 export_to_excel().expect("Error exporting to Excel");
             }
+        } else if let Some(file_name) = &self.import {
+            import_from_excel(file_name).unwrap()
         } else if let &Some(flag) = &self.sync {
             if flag {
                 println!("Syncing data...");

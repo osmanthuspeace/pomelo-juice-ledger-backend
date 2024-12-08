@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-axum = "0.7.9"
+axum = { version = "0.7.9", features = ["default"] }
 clap = { version = "4.5.22", features = ["derive"] }
 diesel = { version = "2.2.6", features = ["postgres", "chrono", "serde_json"] }
 tokio = { version = "1.0.0", features = ["rt", "rt-multi-thread", "macros"] }
@@ -13,6 +13,10 @@ chrono = { version = "0.4.38", features = ["serde"] }
 serde_json = "1.0.133"
 dotenv = "0.15.0"
 rust_xlsxwriter = "0.80.0"
+hyper = { version = "1.5.1", features = ["full"] }
+tower = "0.5.1"
+tower-http = "0.6.2"
+calamine = "0.26.1"
 
 [profile.dev]
 rustfmt.skip_unreachable = true

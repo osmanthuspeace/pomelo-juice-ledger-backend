@@ -37,21 +37,31 @@ pub fn export_to_excel() -> Result<(), Box<dyn std::error::Error>> {
             .write_string(0, 2, "摘要")
             .expect("Error writing header");
         sheet
-            .write_string(0, 3, "收入")
+            .write_string(0, 3, "类型")
             .expect("Error writing header");
         sheet
-            .write_string(0, 4, "支出")
+            .write_string(0, 4, "账户")
             .expect("Error writing header");
         sheet
-            .write_string(0, 5, "结余")
+            .write_string(0, 5, "收入")
+            .expect("Error writing header");
+        sheet
+            .write_string(0, 6, "支出")
+            .expect("Error writing header");
+        sheet
+            .write_string(0, 7, "结余")
             .expect("Error writing header");
         for (i, tr) in transactions.iter().enumerate() {
             let row = (i + 1) as u32;
             let month = tr.date.month();
             let day = tr.date.day();
             let description = &tr.description;
+            let kind = &tr.kind;
+            let account = &tr.account;
+
             let amount = tr.amount;
             let balance = tr.balance;
+
             sheet
                 .write_number(row, 0, month as f64)
                 .expect("Error writing month");
@@ -61,17 +71,23 @@ pub fn export_to_excel() -> Result<(), Box<dyn std::error::Error>> {
             sheet
                 .write_string(row, 2, description)
                 .expect("Error writing description");
+            sheet
+                .write_string(row, 3, kind)
+                .expect("Error writing account");
+            sheet
+                .write_string(row, 4, account)
+                .expect("Error writing account");
             if amount > 0.0 {
                 sheet
-                    .write_number(row, 3, amount)
+                    .write_number(row, 5, amount)
                     .expect("Error writing income");
             } else {
                 sheet
-                    .write_number(row, 4, -amount)
+                    .write_number(row, 6, -amount)
                     .expect("Error writing expense");
             }
             sheet
-                .write_number(row, 5, balance)
+                .write_number(row, 7, balance)
                 .expect("Error writing balance");
         }
     }
