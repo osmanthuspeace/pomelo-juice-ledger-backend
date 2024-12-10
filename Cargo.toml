@@ -15,7 +15,7 @@ dotenv = "0.15.0"
 rust_xlsxwriter = "0.80.0"
 hyper = { version = "1.5.1", features = ["full"] }
 tower = "0.5.1"
-tower-http = "0.6.2"
+tower-http = { version = "0.6.2", features = ["cors"] }
 calamine = "0.26.1"
 
 [profile.dev]
