@@ -25,6 +25,16 @@ pub struct Summary {
     pub amount: f64,
 }
 
+// #[derive(Debug, Queryable, Insertable, Serialize, Deserialize)]
+// #[table_name = "user"]
+// pub struct User {
+//     pub id: i32,
+//     
+//     pub username: String,
+//     pub password: String,
+//     pub is_modified: bool,
+// }
+
 //插入模型
 #[derive(Debug, Queryable, Insertable, Serialize, Deserialize)]
 #[diesel(table_name = transactions)]

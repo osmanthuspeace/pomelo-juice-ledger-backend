@@ -4,4 +4,5 @@ mod connection;
 pub mod init_service;
 mod update_service;
 mod sync_service;
+pub mod undo_service;
 

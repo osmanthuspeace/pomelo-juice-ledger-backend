@@ -5,7 +5,7 @@ use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::Json;
 use chrono::{Datelike, NaiveDate, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize)]
 pub struct GetQuery {
@@ -13,24 +13,14 @@ pub struct GetQuery {
     pub to: Option<String>,
 }
 pub async fn get_transactions(Query(params): Query<GetQuery>) -> impl IntoResponse {
-    let from = NaiveDate::parse_from_str(
-        &params.from.unwrap_or(
-            NaiveDate::from_ymd_opt(Utc::now().year(), Utc::now().month(), 1)
-                .unwrap()
-                .to_string(),
-        ),
-        "%Y-%m-%d",
-    )
-    .unwrap();
-    let to = NaiveDate::parse_from_str(
-        &params.to.unwrap_or(
-            NaiveDate::from_ymd_opt(Utc::now().year(), Utc::now().month(), Utc::now().day())
-                .unwrap()
-                .to_string(),
-        ),
-        "%Y-%m-%d",
-    )
-    .unwrap();
+    let from = match NaiveDate::parse_from_str(&params.from.unwrap_or("".to_string()), "%Y-%m-%d") {
+        Ok(f) => f,
+        Err(_) => return Err(StatusCode::BAD_REQUEST),
+    };
+    let to = match NaiveDate::parse_from_str(&params.to.unwrap_or("".to_string()), "%Y-%m-%d") {
+        Ok(t) => t,
+        Err(_) => return Err(StatusCode::BAD_REQUEST),
+    };
     let result = service::get_service::get_transactions(from, to);
     match result {
         Ok(transactions) => Ok(Json(transactions)),
@@ -49,14 +39,44 @@ pub struct CreateQuery {
     pub amount: f64,
     pub account: String,
 }
-pub async fn create_transactions(Query(params): Query<CreateQuery>) {
+#[derive(Serialize)]
+struct ResponseMessage {
+    message: String,
+    transaction_id: Option<i32>,
+}
+pub async fn create_transactions(Json(params): Json<CreateQuery>) -> impl IntoResponse {
+    let date = match NaiveDate::parse_from_str(&params.date, "%Y-%m-%d") {
+        Ok(d) => d,
+        Err(_) => {
+            let error_response = ResponseMessage {
+                message: "日期格式应为 YYYY-MM-DD".to_string(),
+                transaction_id: None,
+            };
+            return (StatusCode::BAD_REQUEST, Json(error_response));
+        }
+    };
     let new_transaction = NewTransaction::new(
-        NaiveDate::parse_from_str(&params.date, "%Y-%m-%d").unwrap(),
+        date,
         params.kind,
         params.description,
         params.amount,
         params.account,
     );
-    service::create_service::create_transaction(&new_transaction)
-        .expect("Error creating transaction");
+    match service::create_service::create_transaction(&new_transaction) {
+        Ok(tx) => {
+            let success_response = ResponseMessage {
+                message: "交易记录创建成功".to_string(),
+                transaction_id: Some(tx.id),
+            };
+            (StatusCode::CREATED, Json(success_response))
+        }
+        Err(e) => {
+            eprintln!("创建交易记录失败: {}", e);
+            let error_response = ResponseMessage {
+                message: "创建交易记录失败".to_string(),
+                transaction_id: None,
+            };
+            (StatusCode::INTERNAL_SERVER_ERROR, Json(error_response))
+        }
+    }
 }
