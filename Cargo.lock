@@ -777,7 +777,6 @@ dependencies = [
  "hyper",
  "rust_xlsxwriter",
  "serde",
- "serde_json",
  "tokio",
  "tower",
  "tower-http",

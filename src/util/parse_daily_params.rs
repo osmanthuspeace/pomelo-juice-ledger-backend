@@ -12,5 +12,5 @@ pub fn parse_daily_params(param: String) -> Result<(String, f64), Error> {
         }
     };
     let amount = &param[1..];
-    Ok((account, amount.parse::<f64>().unwrap()))
+    Ok((account, -amount.parse::<f64>().unwrap()))
 }
