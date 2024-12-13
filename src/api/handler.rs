@@ -4,7 +4,7 @@ use axum::extract::Query;
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::Json;
-use chrono::{Datelike, NaiveDate, Utc};
+use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize)]
@@ -13,14 +13,33 @@ pub struct GetQuery {
     pub to: Option<String>,
 }
 pub async fn get_transactions(Query(params): Query<GetQuery>) -> impl IntoResponse {
-    let from = match NaiveDate::parse_from_str(&params.from.unwrap_or("".to_string()), "%Y-%m-%d") {
-        Ok(f) => f,
-        Err(_) => return Err(StatusCode::BAD_REQUEST),
+    let (default_from, default_to) =
+        service::get_service::get_default_date().unwrap_or_else(|_| {
+            (
+                NaiveDate::from_ymd_opt(1970, 1, 1).unwrap(),
+                NaiveDate::from_ymd_opt(2970, 1, 1).unwrap(),
+            )
+        });
+
+    let from = match &params.from {
+        Some(s) if s.is_empty() => default_from,
+        None => default_from,
+        Some(date_str) => match NaiveDate::parse_from_str(date_str, "%Y-%m-%d") {
+            Ok(f) => f,
+            Err(_) => return Err(StatusCode::BAD_REQUEST),
+        },
     };
-    let to = match NaiveDate::parse_from_str(&params.to.unwrap_or("".to_string()), "%Y-%m-%d") {
-        Ok(t) => t,
-        Err(_) => return Err(StatusCode::BAD_REQUEST),
+    let to = match &params.to {
+        Some(s) if s.is_empty() => default_to,
+        None => default_to,
+        Some(date_str) => match NaiveDate::parse_from_str(date_str, "%Y-%m-%d") {
+            Ok(t) => t,
+            Err(_) => return Err(StatusCode::BAD_REQUEST),
+        },
     };
+    if from > to {
+        return Err(StatusCode::BAD_REQUEST);
+    }
     let result = service::get_service::get_transactions(from, to);
     match result {
         Ok(transactions) => Ok(Json(transactions)),

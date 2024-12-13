@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 //查询模型
 #[derive(Debug, Queryable, Insertable, Serialize, Deserialize)]
-#[table_name = "transactions"]
+#[diesel(table_name = transactions)]
 pub struct Transaction {
     pub id: i32,
     pub date: NaiveDate,
@@ -16,7 +16,7 @@ pub struct Transaction {
     pub balance: f64,
 }
 #[derive(Debug, Queryable, Insertable, Serialize, Deserialize)]
-#[table_name = "summary"]
+#[diesel(table_name = summary)]
 pub struct Summary {
     pub id: i32,
 

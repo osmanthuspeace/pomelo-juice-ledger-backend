@@ -10,7 +10,6 @@ use diesel::result::Error;
 pub fn undo_last_transaction() -> Result<(), Error> {
     let connection = &mut establish_connection();
 
-    // 开始事务
     connection.batch_execute("BEGIN")?;
 
     // 查找最新的一笔交易记录，按 id 降序
@@ -27,7 +26,6 @@ pub fn undo_last_transaction() -> Result<(), Error> {
         }
     };
 
-    // 删除这笔交易记录
     if let Err(e) =
         diesel::delete(transactions::dsl::transactions.filter(transactions::id.eq(last_tx.id)))
             .execute(connection)
@@ -54,7 +52,6 @@ pub fn undo_last_transaction() -> Result<(), Error> {
         return Err(e);
     }
 
-    // 提交事务
     connection.batch_execute("COMMIT")?;
 
     Ok(())
