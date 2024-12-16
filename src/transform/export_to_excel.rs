@@ -1,7 +1,7 @@
 use crate::db::models::Transaction;
 use crate::service::get_service;
 use chrono::Datelike;
-use rust_xlsxwriter::{Format, FormatAlign, FormatPattern, Workbook};
+use rust_xlsxwriter::{Format, FormatAlign, Workbook};
 use std::collections::HashMap;
 
 pub fn export_to_excel() -> Result<(), Box<dyn std::error::Error>> {
@@ -19,10 +19,7 @@ pub fn export_to_excel() -> Result<(), Box<dyn std::error::Error>> {
     }
     let mut workbook = Workbook::new();
     // 定义表头格式
-    let header_format = Format::new()
-        .set_bold()
-        .set_pattern(FormatPattern::Solid)
-        .set_align(FormatAlign::Center);
+    let header_format = Format::new().set_bold().set_align(FormatAlign::Center);
     let number_format = Format::new().set_num_format("0.00");
     for (month, transactions) in transactions_by_month {
         let sheet = workbook.add_worksheet();
@@ -33,6 +30,27 @@ pub fn export_to_excel() -> Result<(), Box<dyn std::error::Error>> {
                 .write_string_with_format(0, col as u16, header, &header_format)
                 .expect("Error writing header");
         }
+        sheet
+            .set_column_width(0, 4)
+            .expect("Error setting column width");
+        sheet
+            .set_column_width(1, 4)
+            .expect("Error setting column width");
+        sheet
+            .set_column_width(2, 20)
+            .expect("Error setting column width");
+        sheet
+            .set_column_width(3, 10)
+            .expect("Error setting column width");
+        sheet
+            .set_column_width(4, 12)
+            .expect("Error setting column width");
+        sheet
+            .set_column_width(5, 10)
+            .expect("Error setting column width");
+        sheet
+            .set_column_width(6, 10)
+            .expect("Error setting column width");
         for (i, tr) in transactions.iter().enumerate() {
             let row = (i + 1) as u32;
             let month = tr.date.month();
