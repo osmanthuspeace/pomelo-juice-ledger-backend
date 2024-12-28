@@ -42,30 +42,32 @@ pub enum Commands {
     Undo,
     /// 添加交易记录
     Add {
-        #[arg(num_args = 1..=3)]
-        args: Vec<String>,
-        #[arg(short = 'f', long = "food")]
-        food: bool,
-        #[arg(short = 'l', long = "life")]
-        life: bool,
-        #[arg(short = 's', long = "study")]
-        study: bool,
-        #[arg(short = 'r', long = "rest")]
-        rest: bool,
-        #[arg(long = "salary")]
-        salary: bool,
-        #[arg(short = 't', long = "transfer")]
-        transfer: bool,
-        #[arg(short = 'o', long = "other")]
-        other: bool,
-        #[arg(short = 'a', long = "alipay")]
-        alipay: bool,
-        #[arg(short = 'w', long = "wechat")]
-        wechat: bool,
-        #[arg(short = 'b', long = "bankofchina")]
-        bankofchina: bool,
-        #[arg(short = 'i', long = "icbc")]
-        icbc: bool,
+        #[arg(num_args = 1..)]
+        raw_args: Vec<String>,
+        // #[arg(num_args = 1..=3)]
+        // args: Vec<String>, //（时间），描述，金额
+        // #[arg(short = 'f', long = "food")]
+        // food: bool,
+        // #[arg(short = 'l', long = "life")]
+        // life: bool,
+        // #[arg(short = 's', long = "study")]
+        // study: bool,
+        // #[arg(short = 'r', long = "rest")]
+        // rest: bool,
+        // #[arg(long = "salary")]
+        // salary: bool,
+        // #[arg(short = 't', long = "transfer")]
+        // transfer: bool,
+        // #[arg(short = 'o', long = "other")]
+        // other: bool,
+        // #[arg(short = 'a', long = "alipay")]
+        // alipay: bool,
+        // #[arg(short = 'w', long = "wechat")]
+        // wechat: bool,
+        // #[arg(short = 'b', long = "bankofchina")]
+        // bankofchina: bool,
+        // #[arg(short = 'i', long = "icbc")]
+        // icbc: bool,
     },
 }
 impl Cli {
@@ -79,33 +81,7 @@ impl Cli {
             Commands::Import { file } => handle_import_command(file),
             Commands::Undo => handle_undo_command(),
             Commands::Sync => handle_sync_command(),
-            Commands::Add {
-                args,
-                food,
-                life,
-                study,
-                rest,
-                salary,
-                transfer,
-                other,
-                alipay,
-                wechat,
-                bankofchina,
-                icbc,
-            } => handle_add_command(
-                args,
-                food,
-                life,
-                study,
-                rest,
-                salary,
-                transfer,
-                other,
-                alipay,
-                wechat,
-                bankofchina,
-                icbc,
-            ),
+            Commands::Add { raw_args } => handle_add_command(raw_args),
         }
     }
 }

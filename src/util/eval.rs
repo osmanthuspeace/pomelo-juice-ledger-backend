@@ -25,7 +25,7 @@ pub fn eval(expression: &str) -> f64 {
         eprintln!("计算时出现错误: {}", e);
         0.0
     });
-    -res
+    res
 }
 
 fn tokenize(expr: &str) -> Result<Vec<Token>, String> {
