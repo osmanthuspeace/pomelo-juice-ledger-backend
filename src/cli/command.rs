@@ -23,11 +23,21 @@ pub struct Cli {
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     /// 初始化参数
+    #[command(
+        about = "初始化总账本",
+        long_about = "需要传入五个参数：支付宝余额、微信余额、中国银行余额、工商银行余额、存款余额",
+        // usage = "cli init <alipay_amount> <wechat_amount> <bankofchina_amount> <icbc_amount> <storage_amount>",
+    )]
     Init {
         #[arg(num_args = 5)]
         params: Vec<f64>,
     },
     /// 每日惯例：三餐
+    #[command(
+        about = "每日三餐记录",
+        long_about = "需要传入三个参数：早餐、午餐、晚餐，格式为“w30”或者“a20”，前面的字母代表账户，后面的数字代表金额",
+        // usage = "cli daily <breakfast> <lunch> <dinner>",
+    )]
     Daily {
         #[arg(num_args = 3)]
         daily_params: Vec<String>,
@@ -41,6 +51,11 @@ pub enum Commands {
     /// 撤销上一步
     Undo,
     /// 添加交易记录
+    #[command(
+        about = "添加一条新的交易记录",
+        long_about = "添加一条新的交易记录，需要传入三个参数：日期、描述、金额，可以使用“/”分隔",
+    // usage = "cli add -fa <data> <description> <amount>",
+    )]
     Add {
         #[arg(num_args = 1..)]
         raw_args: Vec<String>,

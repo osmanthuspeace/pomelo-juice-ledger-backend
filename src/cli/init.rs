@@ -1,4 +1,5 @@
 use crate::service::init_service::init_summary;
+use crate::service::sync_service::sync_balance;
 
 pub fn handle_init_command(params: Vec<f64>) {
     if params.len() < 5 {
@@ -8,4 +9,5 @@ pub fn handle_init_command(params: Vec<f64>) {
     println!("Initializing system with parameters: {:?}", params);
     init_summary(params[0], params[1], params[2], params[3], params[4])
         .expect("Error initializing system");
+    sync_balance().expect("Error syncing balance");
 }
