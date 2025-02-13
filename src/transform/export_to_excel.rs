@@ -21,7 +21,11 @@ pub fn export_to_excel() -> Result<(), Box<dyn std::error::Error>> {
     // 定义表头格式
     let header_format = Format::new().set_bold().set_align(FormatAlign::Center);
     let number_format = Format::new().set_num_format("0.00");
-    for (month, transactions) in transactions_by_month {
+    for (month, mut transactions) in transactions_by_month {
+
+        //TODO: 虽然希望按日期排序，但是排序之后剩余金额会乱序，所以暂时不排序
+        // transactions.sort_by(|a, b| a.date.cmp(&b.date));
+        
         let sheet = workbook.add_worksheet();
         sheet.set_name(&month).expect("Error setting sheet name");
         let headers = ["月", "日", "摘要", "类型", "账户", "收入", "支出", "结余"];

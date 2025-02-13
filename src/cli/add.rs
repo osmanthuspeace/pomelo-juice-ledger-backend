@@ -43,11 +43,14 @@ fn parse_sub_args(sub_args: &Vec<String>) -> (String, String, NaiveDate, String,
     let mut amount = 0.0;
 
     let mut idx = 0;
+    // println!("{:?}", sub_args);
     while idx < sub_args.len() {
         let token = &sub_args[idx];
+        // println!("token: {}", token);
 
         // 1) 如果是 -- 开头的参数
         if token.starts_with('-') {
+            // println!("进入参数解析");
             let (k, a, s) = determine_kind_and_account_with_sign(token);
 
             if !k.is_empty() {
@@ -65,6 +68,7 @@ fn parse_sub_args(sub_args: &Vec<String>) -> (String, String, NaiveDate, String,
         }
         // 2) 如果是日期
         if is_date_format(token) {
+            // println!("进入日期解析");
             let parsed_date = parse_date(token);
             if let Some(d) = parsed_date {
                 date = d;
@@ -74,6 +78,7 @@ fn parse_sub_args(sub_args: &Vec<String>) -> (String, String, NaiveDate, String,
         }
         // 3) 如果是金额
         if looks_like_amount(token) {
+            // println!("进入金额解析");
             let amt = parse_amount(token);
             // 这里根据 sign 来决定最终是正还是负
             amount = sign as f64 * amt;
@@ -147,9 +152,11 @@ fn determine_kind_and_account_with_sign(arg: &str) -> (String, String, i32) {
 /// 判断一个字符串是否像日期 (例如 "12-25")
 fn is_date_format(s: &str) -> bool {
     let parts: Vec<&str>;
-    if s.contains('.') {
-        parts = s.split('.').collect();
-    } else if s.contains('-') {
+    //防止和小数点混淆
+    // if s.contains('.') {
+    //     parts = s.split('.').collect();
+    // } else
+    if s.contains('-') {
         parts = s.split('-').collect();
     } else {
         return false;
@@ -194,9 +201,13 @@ fn looks_like_amount(s: &str) -> bool {
 fn parse_amount(s: &str) -> f64 {
     match s.chars().next() {
         Some('=') => eval(s),
-        _ => s.parse::<f64>().unwrap_or_else(|_| {
-            eprintln!("金额解析错误，使用 0.0");
-            0.0
-        }),
+        _ => {
+            let res = s.parse::<f64>();
+            print!("{:?}", res);
+            res.unwrap_or_else(|_| {
+                eprintln!("金额解析错误，使用 0.0");
+                0.0
+            })
+        }
     }
 }
